@@ -9,7 +9,7 @@ from PyQt6.QtCore import Qt, QRect, QEvent
 class AutoClickerGUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.drag_position = None  # To track window drag offset
+        self.drag_position = None
         self.initUI()
         self.load_settings()
         self.running = False
@@ -52,7 +52,6 @@ class AutoClickerGUI(QWidget):
         self.gui_title = QLabel(" Auto Respawn by Crysiox", self)
         self.gui_title.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         self.gui_title.move(15, 15)
-        # Install event filter to make the title draggable
         self.gui_title.installEventFilter(self)
 
         self.close_btn = QPushButton("X", self)
@@ -108,7 +107,6 @@ class AutoClickerGUI(QWidget):
         self.setLayout(layout)
 
     def eventFilter(self, obj, event):
-        # Allow dragging when holding the title label
         if obj == self.gui_title:
             if event.type() == QEvent.Type.MouseButtonPress and event.button() == Qt.MouseButton.LeftButton:
                 self.drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
