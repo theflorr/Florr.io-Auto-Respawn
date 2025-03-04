@@ -1,12 +1,30 @@
-print("[*] LOGS WILL BE DISPLAYED HERE [*]"); print()
-
 import sys, os, json, threading, time, requests
 import cv2 as c, numpy as n, pyautogui as p
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel, QLineEdit, QGridLayout
 from PyQt6.QtGui import QFont, QPainter, QBrush, QColor, QRegion, QBitmap
 from PyQt6.QtCore import Qt, QRect, QEvent
 
-class AutoClickerGUI(QWidget):
+def getassets(url, path):
+    if not os.path.exists(path):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers)
+        with open(path, 'wb') as file:
+            file.write(response.content)
+
+assets_dir = "assets"
+redx_path = os.path.join(assets_dir, "redx.png")
+ready_path = os.path.join(assets_dir, "ready.png")
+
+os.makedirs(assets_dir, exist_ok=True)
+getassets("https://files.catbox.moe/svo4wt.png", redx_path)
+getassets("https://files.catbox.moe/8i05d2.png", ready_path)
+
+# ignore this if your viewing the code. which your doing
+print("[*] LOGS WILL BE DISPLAYED HERE [*]"); print()
+
+class AutoRESPGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.drag_position = None
@@ -15,8 +33,20 @@ class AutoClickerGUI(QWidget):
         self.running = False
 
     def initUI(self):
+    
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setGeometry(100, 100, 320, 275)
+    
+        window_width = 320
+        window_height = 275
+        self.setGeometry(0, 0, window_width, window_height)
+    
+        screen = QApplication.primaryScreen()
+        screen_size = screen.size()
+        center_x = (screen_size.width() - window_width) // 2
+        center_y = (screen_size.height() - window_height) // 2
+    
+        self.move(center_x, center_y)
+    
         self.setStyleSheet("""
             QWidget {
                 background-color: #121212;
@@ -47,7 +77,10 @@ class AutoClickerGUI(QWidget):
                 color: #E0E0E0;
             }
         """)
+    
         self.set_rounded_corners()
+    
+    
 
         self.gui_title = QLabel(" Auto Respawn by Crysiox", self)
         self.gui_title.setFont(QFont("Arial", 16, QFont.Weight.Bold))
@@ -165,13 +198,13 @@ class AutoClickerGUI(QWidget):
         if not self.running:
             self.running = True
             self.status_label.setText("Status: Running")
-            threading.Thread(target=self.auto_clicker, daemon=True).start()
+            threading.Thread(target=self.clicker, daemon=True).start()
 
     def stop_clicker(self):
         self.running = False
         self.status_label.setText("Status: Stopped")
 
-    def auto_clicker(self):
+    def clicker(self):
         redx = c.imread("assets/redx.png", 0)
         ready = c.imread("assets/ready.png", 0)
         while self.running:
@@ -184,6 +217,6 @@ class AutoClickerGUI(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    w = AutoClickerGUI()
+    w = AutoRESPGUI()
     w.show()
     sys.exit(app.exec())
